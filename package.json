@@ -1,0 +1,17 @@
+{
+  "name": "take-home-assignment",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm --filter @magic-dash/app build",
+    "dev": "pnpm --filter @magic-dash/app dev",
+    "lint": "pnpm --filter @magic-dash/app lint",
+    "start": "pnpm --filter @magic-dash/app start",
+    "db:start": "npx supabase start",
+    "db:stop": "npx supabase stop",
+    "db:migrate": "npx supabase db push --local --include-all",
+    "db:reset": "npx supabase db reset --local",
+    "db:gen:types": "npx supabase gen types typescript --local > apps/magic-dash/src/types/supabase.ts"
+  },
+  "packageManager": "pnpm@10.14.0"
+}
