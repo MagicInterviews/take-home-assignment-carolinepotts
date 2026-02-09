@@ -32,7 +32,7 @@ export async function GET() {
 
   const { data: teachers, error: teachersError } = await supabase
     .from("teachers")
-    .select("id, name, active, organization_id")
+    .select("id, name, active, organization_id, grade_levels")
     .eq("organization_id", admin.organization_id)
     .order("name");
 

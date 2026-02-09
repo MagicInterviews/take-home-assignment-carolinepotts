@@ -136,6 +136,7 @@ export type Database = {
         Row: {
           active: boolean | null
           created_at: string | null
+          grade_levels: Database["public"]["Enums"]["grade_level_enum"][] | null
           id: string
           name: string
           organization_id: string
@@ -145,6 +146,9 @@ export type Database = {
         Insert: {
           active?: boolean | null
           created_at?: string | null
+          grade_levels?:
+            | Database["public"]["Enums"]["grade_level_enum"][]
+            | null
           id?: string
           name: string
           organization_id: string
@@ -154,6 +158,9 @@ export type Database = {
         Update: {
           active?: boolean | null
           created_at?: string | null
+          grade_levels?:
+            | Database["public"]["Enums"]["grade_level_enum"][]
+            | null
           id?: string
           name?: string
           organization_id?: string
@@ -174,6 +181,7 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string | null
+          grade_levels: Database["public"]["Enums"]["grade_level_enum"][] | null
           id: string
           name: string
           updated_at: string | null
@@ -181,6 +189,9 @@ export type Database = {
         Insert: {
           created_at?: string | null
           description?: string | null
+          grade_levels?:
+            | Database["public"]["Enums"]["grade_level_enum"][]
+            | null
           id?: string
           name: string
           updated_at?: string | null
@@ -188,6 +199,9 @@ export type Database = {
         Update: {
           created_at?: string | null
           description?: string | null
+          grade_levels?:
+            | Database["public"]["Enums"]["grade_level_enum"][]
+            | null
           id?: string
           name?: string
           updated_at?: string | null
@@ -202,7 +216,21 @@ export type Database = {
       insert_user: { Args: { user_email: string }; Returns: string }
     }
     Enums: {
-      [_ in never]: never
+      grade_level_enum:
+        | "pre-K"
+        | "K"
+        | "1"
+        | "2"
+        | "3"
+        | "4"
+        | "5"
+        | "6"
+        | "7"
+        | "8"
+        | "9"
+        | "10"
+        | "11"
+        | "12"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -332,7 +360,24 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      grade_level_enum: [
+        "pre-K",
+        "K",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+      ],
+    },
   },
 } as const
 

@@ -1,14 +1,17 @@
 "use client";
 
-import type { Tables } from "@/types/supabase";
-import { Card, SearchTextField } from "@magic-dash/ui";
+import { GradeLevelFilterPills } from "@/app/components/GradeLevelFilterPills";
+import type { ToolItem } from "@/lib/tools";
+import { SearchTextField } from "@magic-dash/ui";
 import { useMemo, useState } from "react";
+import { ToolCard } from "./ToolCard";
 
 type ToolListProps = {
-  tools: Tables<"tools">[];
+  tools: ToolItem[];
   teacherName: string;
   organizationName: string;
   teacherActive: boolean;
+  canEdit?: boolean;
 };
 
 export function ToolList({
@@ -16,18 +19,35 @@ export function ToolList({
   teacherName,
   organizationName,
   teacherActive,
+  canEdit = false,
 }: ToolListProps) {
   const [query, setQuery] = useState("");
+  const [selectedGradeLevels, setSelectedGradeLevels] = useState<string[]>([]);
   const normalizedQuery = query.trim().toLowerCase();
 
   const visibleTools = useMemo(() => {
-    if (!normalizedQuery) return tools;
+    let result = tools;
+    if (normalizedQuery) {
+      result = result.filter((tool) => {
+        const haystack = `${tool.name} ${tool.description ?? ""}`.toLowerCase();
+        return haystack.includes(normalizedQuery);
+      });
+    }
+    if (selectedGradeLevels.length > 0) {
+      result = result.filter((tool) =>
+        selectedGradeLevels.every((g) => tool.grade_levels?.includes(g))
+      );
+    }
+    return result;
+  }, [normalizedQuery, selectedGradeLevels, tools]);
 
-    return tools.filter((tool) => {
-      const haystack = `${tool.name} ${tool.description ?? ""}`.toLowerCase();
-      return haystack.includes(normalizedQuery);
-    });
-  }, [normalizedQuery, tools]);
+  const filtersActive = normalizedQuery.length > 0 || selectedGradeLevels.length > 0;
+
+  function toggleGradeLevel(level: string) {
+    setSelectedGradeLevels((prev) =>
+      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8">
@@ -38,7 +58,9 @@ export function ToolList({
           </p>
           <h1 className="text-2xl font-semibold">Tools for {teacherName}</h1>
           <p className="text-sm text-gray-600">
-            {tools.length} tools assigned
+            {filtersActive
+              ? `Showing ${visibleTools.length} of ${tools.length} tools`
+              : `${tools.length} tools assigned`}
           </p>
         </div>
         <SearchTextField
@@ -56,18 +78,24 @@ export function ToolList({
           This teacher account is currently inactive. Access to tools may be limited.
         </div>
       )}
+      <GradeLevelFilterPills
+        selectedGradeLevels={selectedGradeLevels}
+        onToggleGradeLevel={toggleGradeLevel}
+      />
       <div className="mt-6 grid gap-4">
         {visibleTools.length === 0 ? (
           <p className="text-sm text-gray-600">
-            No tools match this search.
+            No tools match your{" "}
+            {normalizedQuery && selectedGradeLevels.length > 0
+              ? "search and filters."
+              : normalizedQuery
+              ? "search."
+              : selectedGradeLevels.length > 0
+              ? "filters."
+              : "criteria."}
           </p>
         ) : (
-          visibleTools.map((tool) => (
-            <Card key={tool.id} className="space-y-2">
-              <Card.Title>{tool.name}</Card.Title>
-              <Card.Subtitle>{tool.description ?? "No description yet."}</Card.Subtitle>
-            </Card>
-          ))
+          visibleTools.map((tool) => <ToolCard key={tool.id} tool={tool} canEdit={canEdit} />)
         )}
       </div>
     </div>

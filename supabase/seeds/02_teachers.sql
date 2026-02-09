@@ -35,89 +35,101 @@ BEGIN
   SELECT insert_user('teacher5@blue-valley.edu') INTO blue_teacher5_id;
   SELECT insert_user('teacher6@blue-valley.edu') INTO blue_teacher6_id;
   
-  INSERT INTO teachers (id, user_id, organization_id, name, active) VALUES
+  INSERT INTO teachers (id, user_id, organization_id, name, active, grade_levels) VALUES
   (
     uuid_generate_v4(),
     north_teacher1_id,
     org_1_id,
     'Priya Shah',
-    true
+    true,
+    ARRAY['K','1','2']::grade_level_enum[]
   ),
   (
     uuid_generate_v4(),
     north_teacher2_id,
     org_1_id,
     'Samuel Brooks',
-    false
+    false,
+    ARRAY['3','4','5']::grade_level_enum[]
   ),
   (
     uuid_generate_v4(),
     north_teacher3_id,
     org_1_id,
     'Monica Patel',
-    true
+    true,
+    ARRAY['pre-K','K']::grade_level_enum[]
   ),
   (
     uuid_generate_v4(),
     north_teacher4_id,
     org_1_id,
     'Fatima Hassan',
-    true
+    true,
+    ARRAY['6','7','8']::grade_level_enum[]
   ),
   (
     uuid_generate_v4(),
     north_teacher5_id,
     org_1_id,
     'David Li',
-    true
+    true,
+    ARRAY['9','10','11','12']::grade_level_enum[]
   ),
   (
     uuid_generate_v4(),
     north_teacher6_id,
     org_1_id,
     'Claire Novak',
-    true
+    true,
+    '{}'::grade_level_enum[]
   ),
   (
     uuid_generate_v4(),
     blue_teacher1_id,
     org_2_id,
     'Elliot Kim',
-    false
+    false,
+    ARRAY['1','2','3']::grade_level_enum[]
   ),
   (
     uuid_generate_v4(),
     blue_teacher2_id,
     org_2_id,
     'Rosa Diaz',
-    true
+    true,
+    ARRAY['K','1','2','3','4','5']::grade_level_enum[]
   ),
   (
     uuid_generate_v4(),
     blue_teacher3_id,
     org_2_id,
     'Hannah Wang',
-    true
+    true,
+    ARRAY['4','5','6']::grade_level_enum[]
   ),
   (
     uuid_generate_v4(),
     blue_teacher4_id,
     org_2_id,
     'Mateo Cruz',
-    true
+    true,
+    ARRAY['7','8']::grade_level_enum[]
   ),
   (
     uuid_generate_v4(),
     blue_teacher5_id,
     org_2_id,
     'Lena Müller',
-    true
+    true,
+    ARRAY['pre-K','K','1']::grade_level_enum[]
   ),
   (
     uuid_generate_v4(),
     blue_teacher6_id,
     org_2_id,
     'Omar El-Sayed',
-    true
+    true,
+    ARRAY['10','11','12']::grade_level_enum[]
   );
 END $$;

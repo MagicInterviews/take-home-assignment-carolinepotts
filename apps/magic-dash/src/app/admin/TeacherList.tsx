@@ -1,13 +1,17 @@
 "use client";
 
-import { Card, cn, SearchTextField } from "@magic-dash/ui";
+import { ActiveStatusFilter } from "@/app/components/ActiveStatusFilter";
+import { GradeLevelFilterPills } from "@/app/components/GradeLevelFilterPills";
+import { SearchTextField } from "@magic-dash/ui";
 import { useMemo, useState } from "react";
+import { TeacherCard } from "./TeacherCard";
 
 type Teacher = {
   id: string;
   name: string;
   active: boolean;
   organization_id: string;
+  grade_levels: string[] | null;
 };
 
 type TeacherListProps = {
@@ -17,16 +21,39 @@ type TeacherListProps = {
 
 export function TeacherList({ teachers, organizationName }: TeacherListProps) {
   const [query, setQuery] = useState("");
+  const [selectedGradeLevels, setSelectedGradeLevels] = useState<string[]>([]);
+  const [activeFilter, setActiveFilter] = useState<"active" | "inactive" | null>(null);
   const normalizedQuery = query.trim().toLowerCase();
 
   const visibleTeachers = useMemo(() => {
-    if (!normalizedQuery) return teachers;
+    let result = teachers;
+    if (normalizedQuery) {
+      result = result.filter((teacher) => {
+        const haystack = `${teacher.name}`.toLowerCase();
+        return haystack.includes(normalizedQuery);
+      });
+    }
+    if (selectedGradeLevels.length > 0) {
+      result = result.filter((teacher) =>
+        selectedGradeLevels.every((g) => teacher.grade_levels?.includes(g))
+      );
+    }
+    if (activeFilter === "active") {
+      result = result.filter((teacher) => teacher.active);
+    } else if (activeFilter === "inactive") {
+      result = result.filter((teacher) => !teacher.active);
+    }
+    return result;
+  }, [normalizedQuery, selectedGradeLevels, activeFilter, teachers]);
 
-    return teachers.filter((teacher) => {
-      const haystack = `${teacher.name}`.toLowerCase();
-      return haystack.includes(normalizedQuery);
-    });
-  }, [normalizedQuery, teachers]);
+  const filtersActive =
+    normalizedQuery.length > 0 || selectedGradeLevels.length > 0 || activeFilter !== null;
+
+  function toggleGradeLevel(level: string) {
+    setSelectedGradeLevels((prev) =>
+      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8">
@@ -37,7 +64,9 @@ export function TeacherList({ teachers, organizationName }: TeacherListProps) {
           </p>
           <h1 className="text-2xl font-semibold">{organizationName}</h1>
           <p className="text-sm text-gray-600">
-            {teachers.length} teachers
+            {filtersActive
+              ? `Showing ${visibleTeachers.length} of ${teachers.length} teachers`
+              : `${teachers.length} teachers`}
           </p>
         </div>
         <SearchTextField
@@ -50,32 +79,26 @@ export function TeacherList({ teachers, organizationName }: TeacherListProps) {
           }}
         />
       </div>
+      <GradeLevelFilterPills
+        selectedGradeLevels={selectedGradeLevels}
+        onToggleGradeLevel={toggleGradeLevel}
+        totalFilterCount={selectedGradeLevels.length + (activeFilter != null ? 1 : 0)}
+      />
+      <ActiveStatusFilter activeFilter={activeFilter} onActiveFilterChange={setActiveFilter} />
       <div className="mt-6 grid gap-4">
         {visibleTeachers.length === 0 ? (
           <p className="text-sm text-gray-600">
-            No teachers match this search.
+            No teachers match your{" "}
+            {normalizedQuery && (selectedGradeLevels.length > 0 || activeFilter !== null)
+              ? "search and filters."
+              : normalizedQuery
+              ? "search."
+              : selectedGradeLevels.length > 0 || activeFilter !== null
+              ? "filters."
+              : "criteria."}
           </p>
         ) : (
-          visibleTeachers.map((teacher) => (
-            <Card
-              key={teacher.id}
-              className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div>
-                <Card.Title>{teacher.name}</Card.Title>
-              </div>
-              <span
-                className={cn(
-                  "rounded-full px-3 py-1 text-xs font-semibold border",
-                  teacher.active
-                    ? "border-emerald-300 bg-emerald-100 text-emerald-700"
-                    : "border-amber-300 bg-amber-100 text-amber-700"
-                )}
-              >
-                {teacher.active ? "Active" : "Inactive"}
-              </span>
-            </Card>
-          ))
+          visibleTeachers.map((teacher) => <TeacherCard key={teacher.id} teacher={teacher} />)
         )}
       </div>
     </div>
