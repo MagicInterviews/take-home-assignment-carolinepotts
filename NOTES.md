@@ -78,3 +78,15 @@ time-spent:
 - Add pagination to tools and users fetches (if we expect there to be 50+ tools or teachers for a user)
 - Ability to edit teacher details (name, active vs. inactive)
 - Ability to edit tool details (name, description)
+
+## Product decisions
+
+These are a few product judgement calls that I made, based on my understanding of a typical school environment. In a real work environment, I would have discussed these with the relevant stakeholders before implementing:
+
+- Tools can be assigned to multiple grade levels
+- Teachers can be assigned to multiple grade levels
+- When filtering tools or teachers by grade level, show only tools/teachers that meet ALL of the selected filters, not ANY
+  - This is the decision that I am the least confident in; I could see the expected behavior being either way.
+- Admins are able to edit tools from the Tools page, not the Admin page, even though this is admin-only functionality
+  - I chose to do it this way because as an admin, editing tools on one page and viewing them on another feels clunky.
+  - But, I would ask whether we should change the name of the Admin page to "Teachers" or "Staff" instead if we do it this way, since all admin-only functionality is not contained within /admin.
