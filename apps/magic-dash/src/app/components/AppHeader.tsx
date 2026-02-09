@@ -3,7 +3,7 @@
 import { Button, Form } from "@magic-dash/ui";
 import Link from "next/link";
 
-export function AppHeader() {
+export function AppHeader({ isAdmin }: { isAdmin: boolean }) {
   return (
     <header className="w-full border-b border-black px-4 py-3">
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-6">
@@ -11,7 +11,7 @@ export function AppHeader() {
           <Link href="/admin" className="text-base">
             MagicDash
           </Link>
-          <Link href="/admin">Admin</Link>
+          {isAdmin && <Link href="/admin">Admin</Link>}
           <Link href="/tools">Tools</Link>
         </nav>
         <Form.Root action="/api/auth/signout" method="post">
