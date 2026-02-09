@@ -1,9 +1,8 @@
 "use client";
 
-import { GRADE_LEVELS } from "@/lib/constants";
+import { GradeLevelFilterPills } from "@/app/components/GradeLevelFilterPills";
 import type { ToolItem } from "@/lib/tools";
 import { SearchTextField } from "@magic-dash/ui";
-import { Filter } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ToolCard } from "./ToolCard";
 
@@ -43,7 +42,6 @@ export function ToolList({
   }, [normalizedQuery, selectedGradeLevels, tools]);
 
   const filtersActive = normalizedQuery.length > 0 || selectedGradeLevels.length > 0;
-  const filtersAppliedCount = selectedGradeLevels.length;
 
   function toggleGradeLevel(level: string) {
     setSelectedGradeLevels((prev) =>
@@ -80,34 +78,10 @@ export function ToolList({
           This teacher account is currently inactive. Access to tools may be limited.
         </div>
       )}
-      <div className="mt-6">
-        <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-          <Filter className="size-4" />
-          <span>Filters ({filtersAppliedCount})</span>
-        </div>
-        <div className="mt-3 pl-6">
-          <p className="mb-2 text-xs font-medium text-gray-600">Grade levels:</p>
-          <div className="flex flex-wrap gap-2">
-            {GRADE_LEVELS.map((level) => {
-              const selected = selectedGradeLevels.includes(level);
-              return (
-                <button
-                  key={level}
-                  type="button"
-                  onClick={() => toggleGradeLevel(level)}
-                  className={
-                    selected
-                      ? "inline-flex rounded-full border border-gray-700 bg-gray-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-gray-600"
-                      : "inline-flex rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
-                  }
-                >
-                  {level}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      <GradeLevelFilterPills
+        selectedGradeLevels={selectedGradeLevels}
+        onToggleGradeLevel={toggleGradeLevel}
+      />
       <div className="mt-6 grid gap-4">
         {visibleTools.length === 0 ? (
           <p className="text-sm text-gray-600">

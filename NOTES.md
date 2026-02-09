@@ -4,6 +4,8 @@ time-spent:
 
 # Notes
 
+## Required Changes:
+
 ### Fixed Defects:
 
 - Hid the admin page from teachers: admin link only shows for admins in the nav, and visiting `/admin` as a teacher redirects to `/tools`.
@@ -50,3 +52,7 @@ time-spent:
   - **How to Test:**
     - Log in as an admin. Go to `/admin`. Click “Edit” on a teacher, change the grade level checkboxes, and save. Confirm the badges update and a refresh shows the new values.
     - Log in as an admin. Go to `/admin`. Click “Edit” on a teacher, change the grade level checkboxes, and click Cancel. Confirm the badges do not update to the new values.
+
+## Additional Improvements:
+
+- Admins are able to filter teachers by grade level. Works the same as the filter tools by grade level functionality.

@@ -1,5 +1,6 @@
 "use client";
 
+import { GradeLevelFilterPills } from "@/app/components/GradeLevelFilterPills";
 import { SearchTextField } from "@magic-dash/ui";
 import { useMemo, useState } from "react";
 import { TeacherCard } from "./TeacherCard";
@@ -19,16 +20,32 @@ type TeacherListProps = {
 
 export function TeacherList({ teachers, organizationName }: TeacherListProps) {
   const [query, setQuery] = useState("");
+  const [selectedGradeLevels, setSelectedGradeLevels] = useState<string[]>([]);
   const normalizedQuery = query.trim().toLowerCase();
 
   const visibleTeachers = useMemo(() => {
-    if (!normalizedQuery) return teachers;
+    let result = teachers;
+    if (normalizedQuery) {
+      result = result.filter((teacher) => {
+        const haystack = `${teacher.name}`.toLowerCase();
+        return haystack.includes(normalizedQuery);
+      });
+    }
+    if (selectedGradeLevels.length > 0) {
+      result = result.filter((teacher) =>
+        selectedGradeLevels.every((g) => teacher.grade_levels?.includes(g))
+      );
+    }
+    return result;
+  }, [normalizedQuery, selectedGradeLevels, teachers]);
 
-    return teachers.filter((teacher) => {
-      const haystack = `${teacher.name}`.toLowerCase();
-      return haystack.includes(normalizedQuery);
-    });
-  }, [normalizedQuery, teachers]);
+  const filtersActive = normalizedQuery.length > 0 || selectedGradeLevels.length > 0;
+
+  function toggleGradeLevel(level: string) {
+    setSelectedGradeLevels((prev) =>
+      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8">
@@ -38,7 +55,11 @@ export function TeacherList({ teachers, organizationName }: TeacherListProps) {
             Organization
           </p>
           <h1 className="text-2xl font-semibold">{organizationName}</h1>
-          <p className="text-sm text-gray-600">{teachers.length} teachers</p>
+          <p className="text-sm text-gray-600">
+            {filtersActive
+              ? `Showing ${visibleTeachers.length} of ${teachers.length} teachers`
+              : `${teachers.length} teachers`}
+          </p>
         </div>
         <SearchTextField
           name="teacher-search"
@@ -50,9 +71,22 @@ export function TeacherList({ teachers, organizationName }: TeacherListProps) {
           }}
         />
       </div>
+      <GradeLevelFilterPills
+        selectedGradeLevels={selectedGradeLevels}
+        onToggleGradeLevel={toggleGradeLevel}
+      />
       <div className="mt-6 grid gap-4">
         {visibleTeachers.length === 0 ? (
-          <p className="text-sm text-gray-600">No teachers match this search.</p>
+          <p className="text-sm text-gray-600">
+            No teachers match your{" "}
+            {normalizedQuery && selectedGradeLevels.length > 0
+              ? "search and filters."
+              : normalizedQuery
+              ? "search."
+              : selectedGradeLevels.length > 0
+              ? "filters."
+              : "criteria."}
+          </p>
         ) : (
           visibleTeachers.map((teacher) => <TeacherCard key={teacher.id} teacher={teacher} />)
         )}
