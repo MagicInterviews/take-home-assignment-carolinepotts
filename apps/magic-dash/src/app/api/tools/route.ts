@@ -41,16 +41,26 @@ export async function GET() {
   const { data: tools, error: toolsError } = await supabase
     .from("tools")
     .select(
-      "id, name, description, created_at, updated_at, teacher_tools ( disabled, teacher_id )",
+      "id, name, description, created_at, updated_at, teacher_tools ( disabled, teacher_id )"
     );
 
   if (toolsError) {
     return NextResponse.json({ error: toolsError.message }, { status: 500 });
   }
 
+  let enabledTools = tools ?? [];
+  if (teacher) {
+    enabledTools = enabledTools.filter((tool) => {
+      const disabledForThisTeacher = tool.teacher_tools?.some(
+        (tt) => tt.teacher_id === teacher.id && tt.disabled === true
+      );
+      return !disabledForThisTeacher;
+    });
+  }
+
   return NextResponse.json({
-    tools: tools ?? [],
-    teacherName: teacher?.name || 'All Teachers',
+    tools: enabledTools,
+    teacherName: teacher?.name || "All Teachers",
     organizationName: teacher?.organizations?.name ?? "Your Organization",
     teacherActive: teacher?.active ?? true,
   });
