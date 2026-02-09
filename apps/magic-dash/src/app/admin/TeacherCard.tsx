@@ -1,15 +1,23 @@
-import type { ToolItem } from "@/lib/tools";
+"use client";
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Pencil, Save, X } from "lucide-react";
-import { updateTool } from "./actions";
-import { Card, Button } from "@magic-dash/ui";
+import { updateTeacher } from "./actions";
+import { Card, Button, cn } from "@magic-dash/ui";
 import { GradeLevelDisplay } from "@/app/components/GradeLevelDisplay";
 import { GradeLevelCheckboxes } from "@/app/components/GradeLevelCheckboxes";
 
-type ToolCardProps = {
-  tool: ToolItem;
-  canEdit: boolean;
+type Teacher = {
+  id: string;
+  name: string;
+  active: boolean;
+  organization_id: string;
+  grade_levels: string[] | null;
+};
+
+type TeacherCardProps = {
+  teacher: Teacher;
 };
 
 function SavingSpinner() {
@@ -18,10 +26,10 @@ function SavingSpinner() {
   );
 }
 
-export function ToolCard({ tool, canEdit }: ToolCardProps) {
+export function TeacherCard({ teacher }: TeacherCardProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
-  const [selected, setSelected] = useState<string[]>(tool.grade_levels ?? []);
+  const [selected, setSelected] = useState<string[]>(teacher.grade_levels ?? []);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,14 +41,14 @@ export function ToolCard({ tool, canEdit }: ToolCardProps) {
   }
 
   function handleEdit() {
-    setSelected(tool.grade_levels ?? []);
+    setSelected(teacher.grade_levels ?? []);
     setError(null);
     setIsEditing(true);
   }
 
   function handleCancel() {
     if (!saving) {
-      setSelected(tool.grade_levels ?? []);
+      setSelected(teacher.grade_levels ?? []);
       setError(null);
       setIsEditing(false);
     }
@@ -49,7 +57,7 @@ export function ToolCard({ tool, canEdit }: ToolCardProps) {
   async function handleSave() {
     setSaving(true);
     setError(null);
-    const result = await updateTool(tool.id, { grade_levels: selected });
+    const result = await updateTeacher(teacher.id, { grade_levels: selected });
     if (result.success) {
       router.refresh();
       setIsEditing(false);
@@ -59,33 +67,42 @@ export function ToolCard({ tool, canEdit }: ToolCardProps) {
     setSaving(false);
   }
 
-  const showEditView = canEdit && isEditing;
-
   return (
-    <Card className={canEdit ? "flex flex-col gap-4" : "space-y-2"}>
+    <Card className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-2">
-        <Card.Title className="min-w-0 flex-1">{tool.name}</Card.Title>
-        {canEdit && !showEditView && (
-          <Button
-            variant="secondary"
-            onClick={handleEdit}
-            className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 text-xs"
-            aria-label="Edit grade levels"
+        <div className="min-w-0 flex-1">
+          <Card.Title>{teacher.name}</Card.Title>
+          {!isEditing && <GradeLevelDisplay grade_levels={teacher.grade_levels} />}
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <span
+            className={cn(
+              "rounded-full px-3 py-1 text-xs font-semibold border",
+              teacher.active
+                ? "border-emerald-300 bg-emerald-100 text-emerald-700"
+                : "border-amber-300 bg-amber-100 text-amber-700"
+            )}
           >
-            <Pencil className="size-3.5" />
-            <span>Edit</span>
-          </Button>
-        )}
+            {teacher.active ? "Active" : "Inactive"}
+          </span>
+          {!isEditing && (
+            <Button
+              variant="secondary"
+              onClick={handleEdit}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs"
+              aria-label="Edit grade levels"
+            >
+              <Pencil className="size-3.5" />
+              <span>Edit</span>
+            </Button>
+          )}
+        </div>
       </div>
-      <div>
-        <Card.Subtitle>{tool.description ?? "No description yet."}</Card.Subtitle>
-        {!showEditView && <GradeLevelDisplay grade_levels={tool.grade_levels} />}
-      </div>
-      {showEditView && (
+      {isEditing && (
         <>
           <GradeLevelCheckboxes selected={selected} onToggle={toggle} disabled={saving} />
           <div className="flex flex-col items-end gap-2">
-            <div className="flex flex-wrap items-center justify-end gap-2 min-h-8">
+            <div className="flex min-h-8 flex-wrap items-center justify-end gap-2">
               {saving ? (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs text-gray-500">
                   <SavingSpinner />

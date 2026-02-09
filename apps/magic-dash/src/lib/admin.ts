@@ -8,6 +8,7 @@ export type AdminData = {
     name: string;
     active: boolean;
     organization_id: string;
+    grade_levels: string[] | null;
   }>;
 };
 
