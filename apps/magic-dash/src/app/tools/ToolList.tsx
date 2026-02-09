@@ -1,7 +1,9 @@
 "use client";
 
+import { GRADE_LEVELS } from "@/lib/constants";
 import type { ToolItem } from "@/lib/tools";
 import { SearchTextField } from "@magic-dash/ui";
+import { Filter } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ToolCard } from "./ToolCard";
 
@@ -21,16 +23,33 @@ export function ToolList({
   canEdit = false,
 }: ToolListProps) {
   const [query, setQuery] = useState("");
+  const [selectedGradeLevels, setSelectedGradeLevels] = useState<string[]>([]);
   const normalizedQuery = query.trim().toLowerCase();
 
   const visibleTools = useMemo(() => {
-    if (!normalizedQuery) return tools;
+    let result = tools;
+    if (normalizedQuery) {
+      result = result.filter((tool) => {
+        const haystack = `${tool.name} ${tool.description ?? ""}`.toLowerCase();
+        return haystack.includes(normalizedQuery);
+      });
+    }
+    if (selectedGradeLevels.length > 0) {
+      result = result.filter((tool) =>
+        selectedGradeLevels.every((g) => tool.grade_levels?.includes(g))
+      );
+    }
+    return result;
+  }, [normalizedQuery, selectedGradeLevels, tools]);
 
-    return tools.filter((tool) => {
-      const haystack = `${tool.name} ${tool.description ?? ""}`.toLowerCase();
-      return haystack.includes(normalizedQuery);
-    });
-  }, [normalizedQuery, tools]);
+  const filtersActive = normalizedQuery.length > 0 || selectedGradeLevels.length > 0;
+  const filtersAppliedCount = selectedGradeLevels.length;
+
+  function toggleGradeLevel(level: string) {
+    setSelectedGradeLevels((prev) =>
+      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8">
@@ -40,7 +59,11 @@ export function ToolList({
             {organizationName}
           </p>
           <h1 className="text-2xl font-semibold">Tools for {teacherName}</h1>
-          <p className="text-sm text-gray-600">{tools.length} tools assigned</p>
+          <p className="text-sm text-gray-600">
+            {filtersActive
+              ? `Showing ${visibleTools.length} of ${tools.length} tools`
+              : `${tools.length} tools assigned`}
+          </p>
         </div>
         <SearchTextField
           name="tool-search"
@@ -57,9 +80,46 @@ export function ToolList({
           This teacher account is currently inactive. Access to tools may be limited.
         </div>
       )}
+      <div className="mt-6">
+        <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+          <Filter className="size-4" />
+          <span>Filters ({filtersAppliedCount})</span>
+        </div>
+        <div className="mt-3 pl-6">
+          <p className="mb-2 text-xs font-medium text-gray-600">Grade levels:</p>
+          <div className="flex flex-wrap gap-2">
+            {GRADE_LEVELS.map((level) => {
+              const selected = selectedGradeLevels.includes(level);
+              return (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() => toggleGradeLevel(level)}
+                  className={
+                    selected
+                      ? "inline-flex rounded-full border border-gray-700 bg-gray-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-gray-600"
+                      : "inline-flex rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                  }
+                >
+                  {level}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
       <div className="mt-6 grid gap-4">
         {visibleTools.length === 0 ? (
-          <p className="text-sm text-gray-600">No tools match this search.</p>
+          <p className="text-sm text-gray-600">
+            No tools match your{" "}
+            {normalizedQuery && selectedGradeLevels.length > 0
+              ? "search and filters."
+              : normalizedQuery
+              ? "search."
+              : selectedGradeLevels.length > 0
+              ? "filters."
+              : "criteria."}
+          </p>
         ) : (
           visibleTools.map((tool) => <ToolCard key={tool.id} tool={tool} canEdit={canEdit} />)
         )}

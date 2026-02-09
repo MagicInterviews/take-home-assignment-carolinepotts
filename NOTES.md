@@ -22,11 +22,20 @@ time-spent:
 ### New Feature: Add support for "Grade Level"
 
 - **Admins are able to assign a Grade Level to a tool.**
+
   - **Database:** Added a `grade_level_enum` type (pre-K, K, 1–12) and a `grade_levels` array column on `tools`. The migration was run locally using `pnpm db:migrate`.
   - **Seeds:** Seed data in `03_tools.sql` assigns sample grade levels to each tool (e.g. Lesson Planner K–5, Reading Coach pre-K–3).
   - **Backend:** The tools API route now selects and returns `grade_levels`, and tools are ordered by name so their order stays consistent when you save updates. A server action `updateTool` in `tools/actions.ts` allows admins to update a tool’s `grade_levels` (with validation against the allowed enum values).
   - **Frontend:** On the tools page, admins see an “Edit” button on each tool card. Clicking it shows checkboxes for all grade levels; admins can select/deselect and save. Non-admins see the assigned grade levels as read-only badges.
   - **How to Test:**
-    - Log in as an admin. Go to `/tools`. Click “Edit” on a tool, change the grade level checkboxes, and save. Confirm the badges update and a refresh shows the new values. Confirm that the order of the tools does not change.
+    - Log in as an admin. Go to `/tools`. Click “Edit” on a tool, change the grade level checkboxes, and save. Confirm the badges update and a refresh shows the new values. Confirm that the order of the tools does not change. Confirm that the grade levels show in grade level order.
     - Log in as an admin. Go to `/tools`. Click “Edit” on a tool, change the grade level checkboxes, and click Cancel. Confirm the badges do not update to the new values.
     - Log in as a teacher. Go to `/tools`. Confirm grade level badges are visible but there is no Edit button.
+
+- **Teachers can filter tools by Grade Level on the /tools page.**
+  - Teachers and admins see grade-level filter(s) on `/tools` and can narrow the list to tools that support one or more selected grade levels. Filtering works together with the existing search (by name/description).
+  - **How to Test:**
+    - **No tools match:** With filters and/or search applied so that no tools match, confirm the UI shows a clear “No tools match your search and filters” (or equivalent) message rather than an empty list with no explanation. Confirm that the "No tools match" message works for: filters only (e.g. select a grade that no tool has), search only (e.g. type a string that matches nothing), and filters + search combined.
+    - **Filters only:** Apply only grade-level filters (no search). Confirm only tools that support all selected grades appear. Confirm number of tools in the helper text under the "Tools for (Name)" header is correct (e.g. "Showing 1 of 2 tools"). Confirm the number of selected filters is correct (e.g. "Filters (1)").
+    - **Search only:** Apply only search (no filters). Confirm only tools matching the search text appear.
+    - **Multiple filters & search:** Select multiple grade levels and enter search text. Confirm the list shows tools that (1) match the search and (2) support all of the selected grade levels. Change filters or search and confirm the list updates accordingly.

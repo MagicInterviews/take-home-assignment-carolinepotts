@@ -79,22 +79,15 @@ export function ToolCard({ tool, canEdit }: ToolCardProps) {
       <div>
         <Card.Subtitle>{tool.description ?? "No description yet."}</Card.Subtitle>
         {!showEditView && tool.grade_levels && tool.grade_levels.length > 0 && (
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 pt-1">
-            <span className="text-xs font-medium text-gray-500">Grade levels:</span>
+          <p className="pt-1 text-xs text-gray-600">
+            <span className="font-medium text-gray-500">Grade levels: </span>
             {[...(tool.grade_levels ?? [])]
               .sort(
                 (a, b) =>
                   GRADE_LEVELS.indexOf(a as GradeLevel) - GRADE_LEVELS.indexOf(b as GradeLevel)
               )
-              .map((level) => (
-                <span
-                  key={level}
-                  className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-700"
-                >
-                  {level}
-                </span>
-              ))}
-          </div>
+              .join(", ")}
+          </p>
         )}
       </div>
       {showEditView && (
