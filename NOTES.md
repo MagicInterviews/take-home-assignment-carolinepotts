@@ -55,6 +55,26 @@ time-spent:
 
 ## Additional Improvements:
 
+### Features added that were not required:
+
 - Admins are able to filter teachers by grade level. Works the same as the filter tools by grade level functionality.
 - Admins are able to filter teachers by active vs. inactive.
   - This behaves like the grade level filters, except that only "Active only" or "Inactive only" can be selected (not both at once).
+
+### Some other features/fixes that I noticed and would make with more time:
+
+- Add a primary color other than black, so that the UI looks nicer. This also makes it easier to distinguish buttons from static items on the page. Likely would add a secondary color, too.
+- Make login page UI better to make the user's first impression of the app better
+  - Email & password form fields should be the same width as the buttons
+  - Ability to show & hide password. This would prevent a common support issue where the user thinks that they are having a problem with the application, when in reality they are mistyping, have caps lock on, etc.
+- Instead of showing Sign Out button in the top right, show an avatar with a dropdown menu that includes the user's email and the signout button. Show the user's organization and role here, too (e.g. "Admin at North Ridge").
+  - This creates a natural place for links to account management functions later.
+  - This also has a nice side effect of being helpful for development: it's easier to quickly check who you're logged in as.
+- Add a favicon so that the tab shows our logo.
+- RLS on database - currently, it is fully public which is a security issue
+- Move AppHeader into a layout.tsx file, so that it gets shared among all current and future pages.
+- Add a navigation utils file that includes constants for route names to reduce risk of typos
+- Potentially would move all API routes into Next.js server actions. This depends on whether any external services also need to it these endpoints.
+- Add pagination to tools and users fetches (if we expect there to be 50+ tools or teachers for a user)
+- Ability to edit teacher details (name, active vs. inactive)
+- Ability to edit tool details (name, description)
