@@ -1,5 +1,5 @@
 ---
-time-spent:
+time-spent: 3 hours
 ---
 
 # Notes
