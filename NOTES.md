@@ -56,3 +56,5 @@ time-spent:
 ## Additional Improvements:
 
 - Admins are able to filter teachers by grade level. Works the same as the filter tools by grade level functionality.
+- Admins are able to filter teachers by active vs. inactive.
+  - This behaves like the grade level filters, except that only "Active only" or "Inactive only" can be selected (not both at once).

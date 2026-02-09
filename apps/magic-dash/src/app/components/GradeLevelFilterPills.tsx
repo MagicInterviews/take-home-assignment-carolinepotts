@@ -4,13 +4,16 @@ import { Filter } from "lucide-react";
 type GradeLevelFilterPillsProps = {
   selectedGradeLevels: string[];
   onToggleGradeLevel: (level: string) => void;
+  /** When provided (e.g. when used with other filters like status), use this for the Filters (N) count. */
+  totalFilterCount?: number;
 };
 
 export function GradeLevelFilterPills({
   selectedGradeLevels,
   onToggleGradeLevel,
+  totalFilterCount,
 }: GradeLevelFilterPillsProps) {
-  const filtersAppliedCount = selectedGradeLevels.length;
+  const filtersAppliedCount = totalFilterCount ?? selectedGradeLevels.length;
 
   return (
     <div className="mt-6">
@@ -30,8 +33,8 @@ export function GradeLevelFilterPills({
                 onClick={() => onToggleGradeLevel(level)}
                 className={
                   selected
-                    ? "inline-flex rounded-full border border-gray-700 bg-gray-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-gray-600"
-                    : "inline-flex rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                    ? "inline-flex cursor-pointer rounded-full border border-gray-700 bg-gray-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-gray-600"
+                    : "inline-flex cursor-pointer rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
                 }
               >
                 {level}

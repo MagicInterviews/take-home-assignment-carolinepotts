@@ -1,5 +1,6 @@
 "use client";
 
+import { ActiveStatusFilter } from "@/app/components/ActiveStatusFilter";
 import { GradeLevelFilterPills } from "@/app/components/GradeLevelFilterPills";
 import { SearchTextField } from "@magic-dash/ui";
 import { useMemo, useState } from "react";
@@ -21,6 +22,7 @@ type TeacherListProps = {
 export function TeacherList({ teachers, organizationName }: TeacherListProps) {
   const [query, setQuery] = useState("");
   const [selectedGradeLevels, setSelectedGradeLevels] = useState<string[]>([]);
+  const [activeFilter, setActiveFilter] = useState<"active" | "inactive" | null>(null);
   const normalizedQuery = query.trim().toLowerCase();
 
   const visibleTeachers = useMemo(() => {
@@ -36,10 +38,16 @@ export function TeacherList({ teachers, organizationName }: TeacherListProps) {
         selectedGradeLevels.every((g) => teacher.grade_levels?.includes(g))
       );
     }
+    if (activeFilter === "active") {
+      result = result.filter((teacher) => teacher.active);
+    } else if (activeFilter === "inactive") {
+      result = result.filter((teacher) => !teacher.active);
+    }
     return result;
-  }, [normalizedQuery, selectedGradeLevels, teachers]);
+  }, [normalizedQuery, selectedGradeLevels, activeFilter, teachers]);
 
-  const filtersActive = normalizedQuery.length > 0 || selectedGradeLevels.length > 0;
+  const filtersActive =
+    normalizedQuery.length > 0 || selectedGradeLevels.length > 0 || activeFilter !== null;
 
   function toggleGradeLevel(level: string) {
     setSelectedGradeLevels((prev) =>
@@ -74,16 +82,18 @@ export function TeacherList({ teachers, organizationName }: TeacherListProps) {
       <GradeLevelFilterPills
         selectedGradeLevels={selectedGradeLevels}
         onToggleGradeLevel={toggleGradeLevel}
+        totalFilterCount={selectedGradeLevels.length + (activeFilter != null ? 1 : 0)}
       />
+      <ActiveStatusFilter activeFilter={activeFilter} onActiveFilterChange={setActiveFilter} />
       <div className="mt-6 grid gap-4">
         {visibleTeachers.length === 0 ? (
           <p className="text-sm text-gray-600">
             No teachers match your{" "}
-            {normalizedQuery && selectedGradeLevels.length > 0
+            {normalizedQuery && (selectedGradeLevels.length > 0 || activeFilter !== null)
               ? "search and filters."
               : normalizedQuery
               ? "search."
-              : selectedGradeLevels.length > 0
+              : selectedGradeLevels.length > 0 || activeFilter !== null
               ? "filters."
               : "criteria."}
           </p>
