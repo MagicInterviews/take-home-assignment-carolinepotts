@@ -18,6 +18,7 @@ export default async function ToolsPage() {
         teacherName={data?.teacherName}
         organizationName={data?.organizationName}
         teacherActive={data?.teacherActive}
+        canEdit={isAdmin}
       />
     </>
   );

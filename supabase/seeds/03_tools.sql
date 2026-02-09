@@ -34,20 +34,20 @@ BEGIN
   SELECT id INTO blue_teacher2_id FROM teachers WHERE user_id = blue_teacher2_user_id;
   SELECT id INTO blue_teacher3_id FROM teachers WHERE user_id = blue_teacher3_user_id;
 
-  INSERT INTO tools (name, description)
-  VALUES ('Lesson Planner', 'Build weekly lesson plans and share with your grade team.')
+  INSERT INTO tools (name, description, grade_levels)
+  VALUES ('Lesson Planner', 'Build weekly lesson plans and share with your grade team.', ARRAY['K','1','2','3','4','5']::grade_level_enum[])
   RETURNING id INTO lesson_planner_id;
 
-  INSERT INTO tools (name, description)
-  VALUES ('Behavior Tracker', 'Log behavior incidents and generate quick summaries.')
+  INSERT INTO tools (name, description, grade_levels)
+  VALUES ('Behavior Tracker', 'Log behavior incidents and generate quick summaries.', ARRAY['K','1','2','3','4','5','6','7','8','9','10','11','12']::grade_level_enum[])
   RETURNING id INTO behavior_tracker_id;
 
-  INSERT INTO tools (name, description)
-  VALUES ('Reading Coach', 'Personalized reading passages with progress tracking.')
+  INSERT INTO tools (name, description, grade_levels)
+  VALUES ('Reading Coach', 'Personalized reading passages with progress tracking.', ARRAY['pre-K','K','1','2','3']::grade_level_enum[])
   RETURNING id INTO reading_coach_id;
 
-  INSERT INTO tools (name, description)
-  VALUES ('Math Practice', 'Adaptive math drills for daily warm-ups.')
+  INSERT INTO tools (name, description, grade_levels)
+  VALUES ('Math Practice', 'Adaptive math drills for daily warm-ups.', ARRAY['1','2','3','4','5','6']::grade_level_enum[])
   RETURNING id INTO math_practice_id;
 
   INSERT INTO teacher_tools (id, teacher_id, tool_id, disabled) VALUES

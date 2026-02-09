@@ -41,8 +41,9 @@ export async function GET() {
   const { data: tools, error: toolsError } = await supabase
     .from("tools")
     .select(
-      "id, name, description, created_at, updated_at, teacher_tools ( disabled, teacher_id )"
-    );
+      "id, name, description, grade_levels, created_at, updated_at, teacher_tools ( disabled, teacher_id )"
+    )
+    .order("name", { ascending: true });
 
   if (toolsError) {
     return NextResponse.json({ error: toolsError.message }, { status: 500 });

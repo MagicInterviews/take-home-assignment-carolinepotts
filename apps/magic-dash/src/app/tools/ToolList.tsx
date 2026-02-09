@@ -1,14 +1,16 @@
 "use client";
 
-import type { Tables } from "@/types/supabase";
-import { Card, SearchTextField } from "@magic-dash/ui";
+import type { ToolItem } from "@/lib/tools";
+import { SearchTextField } from "@magic-dash/ui";
 import { useMemo, useState } from "react";
+import { ToolCard } from "./ToolCard";
 
 type ToolListProps = {
-  tools: Tables<"tools">[];
+  tools: ToolItem[];
   teacherName: string;
   organizationName: string;
   teacherActive: boolean;
+  canEdit?: boolean;
 };
 
 export function ToolList({
@@ -16,6 +18,7 @@ export function ToolList({
   teacherName,
   organizationName,
   teacherActive,
+  canEdit = false,
 }: ToolListProps) {
   const [query, setQuery] = useState("");
   const normalizedQuery = query.trim().toLowerCase();
@@ -37,9 +40,7 @@ export function ToolList({
             {organizationName}
           </p>
           <h1 className="text-2xl font-semibold">Tools for {teacherName}</h1>
-          <p className="text-sm text-gray-600">
-            {tools.length} tools assigned
-          </p>
+          <p className="text-sm text-gray-600">{tools.length} tools assigned</p>
         </div>
         <SearchTextField
           name="tool-search"
@@ -58,16 +59,9 @@ export function ToolList({
       )}
       <div className="mt-6 grid gap-4">
         {visibleTools.length === 0 ? (
-          <p className="text-sm text-gray-600">
-            No tools match this search.
-          </p>
+          <p className="text-sm text-gray-600">No tools match this search.</p>
         ) : (
-          visibleTools.map((tool) => (
-            <Card key={tool.id} className="space-y-2">
-              <Card.Title>{tool.name}</Card.Title>
-              <Card.Subtitle>{tool.description ?? "No description yet."}</Card.Subtitle>
-            </Card>
-          ))
+          visibleTools.map((tool) => <ToolCard key={tool.id} tool={tool} canEdit={canEdit} />)
         )}
       </div>
     </div>
